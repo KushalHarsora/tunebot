@@ -38,7 +38,9 @@ const Home = ({ params }: { params: { id: string } }) => {
 
   return (
     <React.Fragment>
-        Hello
+        <main className=' h-screen w-screen flex justify-center items-center font-bold text-2xl'>
+            Hello, {username}
+        </main>
     </React.Fragment>
   )
 }

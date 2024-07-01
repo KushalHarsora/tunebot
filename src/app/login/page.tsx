@@ -69,7 +69,7 @@ const Login = () => {
                 });
 
                 // Hash URL
-                const salt = await bcryptjs.genSalt(10);
+                const salt = await bcryptjs.genSalt(5);
                 const hashedValue = await bcryptjs.hash(data.name, salt);
                 console.log(hashedValue);
 
