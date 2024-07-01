@@ -67,13 +67,7 @@ const Login = () => {
                     },
                     duration: 1500
                 });
-
-                // Hash URL
-                const salt = await bcryptjs.genSalt(5);
-                const hashedValue = await bcryptjs.hash(data.name, salt);
-                console.log(hashedValue);
-
-                router.push(`/home/${hashedValue}`);
+                router.push(`/home/${data.name}`);
             }
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
