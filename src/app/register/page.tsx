@@ -22,7 +22,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import axios, { AxiosResponse } from 'axios';
 import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 const registerSchema = z.object({
     username: z.string().min(2, {
@@ -40,6 +43,8 @@ const registerSchema = z.object({
 
 const Register = () => {
 
+    const router = useRouter();
+
     const form = useForm<z.infer<typeof registerSchema>>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
@@ -50,7 +55,36 @@ const Register = () => {
     });
 
     const onSubmit = async (values: z.infer<typeof registerSchema>) => {
-        console.log(values);
+        try {
+            const response: AxiosResponse = await axios.post("/auth/user/register", { values }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = response.data;
+            if (response.status === 201) {
+                toast.success(data.message || "Registration successful!", {
+                    duration: 1500
+                });
+                router.push("/login");
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                const { status, data } = error.response;
+                console.log(status);
+                if (status === 409) {
+                    toast.error(data.error || "User Already exists", {
+                        duration: 2500
+                    })
+                    router.push("/login");
+                }
+            } else {
+                toast.error("An unexpected error occurred. Please try again.", {
+                    duration: 2500
+                });
+            }
+        }
     };
 
     return (

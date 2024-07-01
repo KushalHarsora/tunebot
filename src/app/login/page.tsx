@@ -22,7 +22,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import axios, { AxiosResponse } from 'axios';
+import bcryptjs from 'bcryptjs';
 import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 const loginSchema = z.object({
     email: z.string().email(),
@@ -35,6 +39,8 @@ const loginSchema = z.object({
 
 const Login = () => {
 
+    const router = useRouter();
+
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -44,7 +50,73 @@ const Login = () => {
     });
 
     const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-        console.log(values);
+        try {
+            const response: AxiosResponse = await axios.post('/auth/user/login', { values },  {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = response.data;
+            
+            if (response.status === 200) {
+                toast.success(data.message || "Login successful!", {
+                    style: {
+                        "backgroundColor": "#D5F5E3",
+                        "color": "black",
+                        "border": "none"
+                    },
+                    duration: 1500
+                });
+
+                // Hash URL
+                const salt = await bcryptjs.genSalt(10);
+                const hashedValue = await bcryptjs.hash(data.name, salt);
+                console.log(hashedValue);
+
+                router.push(`/home/${hashedValue}`);
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response) {
+                const { status, data } = error.response;
+                console.log(status);
+                if (status === 401) {
+                    toast.error(data.error || "User does not Exists", {
+                        style: {
+                            "backgroundColor": "#FADBD8",
+                            "color": "black",
+                            "border": "none"
+                        },
+                        duration: 2500
+                    })
+                    router.push("/register");
+                } else if (status === 409) {
+                    toast.error(data.error || "Invalid Credentials", {
+                        style: {
+                            "backgroundColor": "#FADBD8",
+                            "color": "black",
+                            "border": "none"
+                        },
+                        duration: 2500
+                    });
+                    form.resetField('password');
+                } else {
+                    toast.error(data.error || "Some Error Occured", {
+                        style: {
+                            "backgroundColor": "#FADBD8",
+                            "color": "black",
+                            "border": "none"
+                        },
+                        duration: 2500
+                    });
+                    form.reset();
+                }
+            } else {
+                toast.error("An unexpected error occurred. Please try again.", {
+                    invert: false,
+                    duration: 2500
+                });
+            }
+        }
     };
 
     return (
