@@ -31,7 +31,7 @@ export default function SparklesPreview() {
           <TextGenerateEffect key={key} words={headline} className=" max-lg:text-sm justify-normal" />
         </span>
         <Button
-          className=" p-4 font-semibold text-lg rounded-sm bg-black shadow-2xl lg:hover:bg-white duration-150 ease-in lg:hover:text-black lg:hover:duration-150 lg:hover:ease-out lg:hover:shadow-white max-lg:bg-white max-lg:text-black"
+          className=" p-4 font-semibold text-lg rounded-sm bg-black shadow-2xl lg:hover:bg-white duration-150 ease-in lg:hover:text-black lg:hover:duration-150 lg:hover:ease-out lg:hover:shadow-white max-lg:bg-white max-lg:text-black max-lg:hover:bg-white max-lg:hover:text-black"
           onClick={() => router.push("/login")}
         >
           Login

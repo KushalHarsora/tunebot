@@ -67,7 +67,15 @@ const Login = () => {
                     },
                     duration: 1500
                 });
-                router.push(`/home/${data.name}`);
+
+                const username = data.name.split(" ");
+                var name = "";
+                
+                for(let i = 0; i < username.length; i++) {
+                    name += username[i];
+                }
+
+                router.push(`/home/${name.toLowerCase()}`);
             }
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
